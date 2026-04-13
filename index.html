@@ -1,0 +1,1602 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --nl-bg: #0a0e1a;
+    --nl-surface: #111827;
+    --nl-surface2: #1a2236;
+    --nl-border: rgba(99,179,136,0.18);
+    --nl-accent: #63b388;
+    --nl-accent2: #4f9eff;
+    --nl-gold: #f0b429;
+    --nl-danger: #e25555;
+    --nl-text: #e8edf5;
+    --nl-muted: #7a8ba3;
+    --nl-font: 'Sora', sans-serif;
+    --nl-mono: 'JetBrains Mono', monospace;
+  }
+
+  #nexloan-root {
+    font-family: var(--nl-font);
+    background: var(--nl-bg);
+    color: var(--nl-text);
+    min-height: 600px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nl-header {
+    background: linear-gradient(135deg, #0d1b2e 0%, #0f2744 100%);
+    border-bottom: 1px solid var(--nl-border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nl-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nl-logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #63b388, #4f9eff);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .nl-logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #63b388, #4f9eff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .nl-logo-sub { font-size: 11px; color: var(--nl-muted); margin-top: 1px; font-weight: 400; }
+
+  .nl-stage-indicator {
+    display: flex; gap: 6px; align-items: center;
+  }
+
+  .nl-stage-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--nl-surface2);
+    border: 1px solid var(--nl-border);
+    transition: all 0.3s;
+  }
+  .nl-stage-dot.active { background: var(--nl-accent); border-color: var(--nl-accent); box-shadow: 0 0 8px rgba(99,179,136,0.5); }
+  .nl-stage-dot.done { background: var(--nl-accent2); border-color: var(--nl-accent2); }
+
+  .nl-body {
+    display: flex;
+    flex: 1;
+    min-height: 520px;
+  }
+
+  .nl-sidebar {
+    width: 200px;
+    background: var(--nl-surface);
+    border-right: 1px solid var(--nl-border);
+    padding: 16px 0;
+    flex-shrink: 0;
+  }
+
+  .nl-nav-item {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--nl-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .nl-nav-item:hover { background: var(--nl-surface2); color: var(--nl-text); }
+  .nl-nav-item.active { background: rgba(99,179,136,0.08); color: var(--nl-accent); border-left-color: var(--nl-accent); }
+  .nl-nav-item.locked { opacity: 0.4; cursor: not-allowed; }
+
+  .nl-nav-icon { font-size: 14px; width: 18px; text-align: center; }
+
+  .nl-main {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    max-height: 520px;
+  }
+
+  .nl-page { display: none; }
+  .nl-page.active { display: block; }
+
+  .nl-section-title {
+    font-size: 16px; font-weight: 600;
+    color: var(--nl-text);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .nl-section-sub {
+    font-size: 12px; color: var(--nl-muted);
+    margin-bottom: 20px;
+  }
+
+  .nl-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .nl-field { display: flex; flex-direction: column; gap: 5px; }
+  .nl-field.full { grid-column: 1/-1; }
+
+  .nl-label { font-size: 11px; color: var(--nl-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .nl-input {
+    background: var(--nl-surface2);
+    border: 1px solid var(--nl-border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: var(--nl-text);
+    font-family: var(--nl-font);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .nl-input:focus { border-color: var(--nl-accent); }
+  .nl-input::placeholder { color: var(--nl-muted); opacity: 0.6; }
+
+  select.nl-input { cursor: pointer; }
+
+  .nl-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-family: var(--nl-font);
+    transition: all 0.2s;
+  }
+
+  .nl-btn-primary {
+    background: linear-gradient(135deg, #63b388, #3d9e6a);
+    color: #fff;
+  }
+  .nl-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .nl-btn-secondary {
+    background: var(--nl-surface2);
+    color: var(--nl-text);
+    border: 1px solid var(--nl-border);
+  }
+  .nl-btn-secondary:hover { border-color: var(--nl-accent); color: var(--nl-accent); }
+
+  .nl-btn-danger {
+    background: rgba(226,85,85,0.15);
+    color: var(--nl-danger);
+    border: 1px solid rgba(226,85,85,0.3);
+  }
+
+  .nl-card {
+    background: var(--nl-surface);
+    border: 1px solid var(--nl-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .nl-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .nl-badge-success { background: rgba(99,179,136,0.15); color: var(--nl-accent); border: 1px solid rgba(99,179,136,0.3); }
+  .nl-badge-warning { background: rgba(240,180,41,0.15); color: var(--nl-gold); border: 1px solid rgba(240,180,41,0.3); }
+  .nl-badge-danger { background: rgba(226,85,85,0.15); color: var(--nl-danger); border: 1px solid rgba(226,85,85,0.3); }
+  .nl-badge-info { background: rgba(79,158,255,0.15); color: var(--nl-accent2); border: 1px solid rgba(79,158,255,0.3); }
+
+  .nl-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .nl-stat {
+    background: var(--nl-surface2);
+    border: 1px solid var(--nl-border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .nl-stat-val { font-size: 18px; font-weight: 600; color: var(--nl-accent); font-family: var(--nl-mono); }
+  .nl-stat-lbl { font-size: 10px; color: var(--nl-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  .nl-score-ring {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 6px solid var(--nl-surface2);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    position: relative;
+    margin: 0 auto 16px;
+  }
+
+  .nl-score-val { font-size: 22px; font-weight: 600; font-family: var(--nl-mono); }
+  .nl-score-lbl { font-size: 9px; color: var(--nl-muted); text-transform: uppercase; }
+
+  .nl-progress-bar {
+    height: 6px; background: var(--nl-surface2);
+    border-radius: 3px; overflow: hidden; margin: 8px 0;
+  }
+  .nl-progress-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #63b388, #4f9eff);
+    transition: width 0.5s ease;
+  }
+
+  .nl-timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+  .nl-timeline::before {
+    content: '';
+    position: absolute; left: 8px; top: 0; bottom: 0;
+    width: 1px; background: var(--nl-border);
+  }
+  .nl-timeline-item {
+    position: relative;
+    padding: 0 0 16px;
+    font-size: 12px;
+  }
+  .nl-timeline-dot {
+    position: absolute; left: -20px; top: 2px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--nl-surface2); border: 2px solid var(--nl-border);
+  }
+  .nl-timeline-dot.done { background: var(--nl-accent); border-color: var(--nl-accent); }
+  .nl-timeline-item-title { color: var(--nl-text); font-weight: 500; margin-bottom: 2px; }
+  .nl-timeline-item-sub { color: var(--nl-muted); font-size: 11px; }
+
+  .nl-upload-zone {
+    border: 2px dashed var(--nl-border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    font-size: 12px;
+    color: var(--nl-muted);
+  }
+  .nl-upload-zone:hover { border-color: var(--nl-accent); color: var(--nl-accent); }
+  .nl-upload-icon { font-size: 24px; display: block; margin-bottom: 8px; }
+
+  .nl-ai-box {
+    background: rgba(79,158,255,0.06);
+    border: 1px solid rgba(79,158,255,0.2);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 12px;
+  }
+  .nl-ai-label {
+    font-size: 10px; font-weight: 500; color: var(--nl-accent2);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  }
+  .nl-ai-label::before { content: '◈'; }
+  .nl-ai-response {
+    font-size: 12px; color: var(--nl-text); line-height: 1.6;
+    font-family: var(--nl-mono);
+    white-space: pre-wrap;
+  }
+
+  .nl-loading { display: flex; align-items: center; gap: 8px; color: var(--nl-muted); font-size: 12px; }
+  .nl-spinner {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--nl-border);
+    border-top-color: var(--nl-accent2);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .nl-emi-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--nl-border);
+    font-size: 12px;
+  }
+  .nl-emi-row:last-child { border-bottom: none; }
+
+  .nl-chatbot-btn {
+    position: fixed; bottom: 20px; right: 20px;
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, #63b388, #4f9eff);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 16px rgba(99,179,136,0.3);
+    border: none;
+    z-index: 999;
+    transition: transform 0.2s;
+  }
+  .nl-chatbot-btn:hover { transform: scale(1.08); }
+
+  .nl-chatbot-window {
+    position: fixed; bottom: 80px; right: 20px;
+    width: 320px; max-height: 460px;
+    background: var(--nl-surface);
+    border: 1px solid var(--nl-border);
+    border-radius: 16px;
+    display: flex; flex-direction: column;
+    z-index: 998;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+  }
+  .nl-chatbot-window.hidden { opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95); }
+
+  .nl-chat-header {
+    background: var(--nl-surface2);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--nl-border);
+  }
+  .nl-chat-title { font-size: 13px; font-weight: 500; }
+  .nl-chat-close { background: none; border: none; color: var(--nl-muted); cursor: pointer; font-size: 16px; padding: 0; }
+
+  .nl-chat-messages {
+    flex: 1; overflow-y: auto; padding: 12px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 280px; max-height: 320px;
+  }
+
+  .nl-chat-msg {
+    max-width: 85%; padding: 8px 12px;
+    border-radius: 10px; font-size: 12px; line-height: 1.5;
+  }
+  .nl-chat-msg.bot { background: var(--nl-surface2); color: var(--nl-text); align-self: flex-start; border: 1px solid var(--nl-border); }
+  .nl-chat-msg.user { background: rgba(99,179,136,0.15); color: var(--nl-accent); align-self: flex-end; border: 1px solid rgba(99,179,136,0.3); }
+
+  .nl-chat-input-row {
+    padding: 10px 12px;
+    border-top: 1px solid var(--nl-border);
+    display: flex; gap: 8px;
+  }
+
+  .nl-chat-input {
+    flex: 1; background: var(--nl-surface2);
+    border: 1px solid var(--nl-border);
+    border-radius: 8px; padding: 8px 10px;
+    font-size: 12px; color: var(--nl-text);
+    font-family: var(--nl-font); outline: none;
+  }
+  .nl-chat-input:focus { border-color: var(--nl-accent); }
+
+  .nl-chat-send {
+    background: var(--nl-accent); border: none; border-radius: 8px;
+    padding: 8px 12px; color: #fff; cursor: pointer; font-size: 12px;
+    font-family: var(--nl-font);
+  }
+
+  .nl-divider { height: 1px; background: var(--nl-border); margin: 16px 0; }
+
+  .nl-otp-input {
+    display: flex; gap: 8px; justify-content: center; margin: 12px 0;
+  }
+  .nl-otp-digit {
+    width: 36px; height: 40px; border-radius: 6px;
+    background: var(--nl-surface2); border: 1px solid var(--nl-border);
+    text-align: center; font-size: 18px; font-family: var(--nl-mono);
+    color: var(--nl-accent); outline: none;
+  }
+  .nl-otp-digit:focus { border-color: var(--nl-accent); }
+
+  .nl-success-screen {
+    text-align: center; padding: 32px 16px;
+  }
+  .nl-success-icon { font-size: 48px; margin-bottom: 12px; }
+  .nl-success-title { font-size: 18px; font-weight: 600; color: var(--nl-accent); margin-bottom: 8px; }
+  .nl-success-sub { font-size: 13px; color: var(--nl-muted); line-height: 1.6; }
+
+  .nl-fraud-result { margin-top: 8px; }
+  .nl-fraud-ok { color: var(--nl-accent); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .nl-fraud-fail { color: var(--nl-danger); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+
+  .nl-rate-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  .nl-rate-table th { padding: 6px 10px; text-align: left; color: var(--nl-muted); font-weight: 500; border-bottom: 1px solid var(--nl-border); font-size: 11px; text-transform: uppercase; }
+  .nl-rate-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .nl-rate-table tr.highlight td { color: var(--nl-accent); font-weight: 500; }
+
+  .nl-toggle-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .nl-toggle { padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid var(--nl-border); background: var(--nl-surface2); color: var(--nl-muted); transition: all 0.2s; }
+  .nl-toggle.active { background: rgba(99,179,136,0.12); color: var(--nl-accent); border-color: rgba(99,179,136,0.4); }
+
+  .nl-email-preview {
+    background: #fff; color: #1a1a2e; border-radius: 10px;
+    padding: 20px; font-size: 12px; line-height: 1.8;
+    font-family: Georgia, serif; margin-top: 12px;
+  }
+  .nl-email-preview h3 { font-size: 15px; margin-bottom: 8px; color: #1a1a2e; }
+
+  .nl-stepper { display: flex; gap: 0; margin-bottom: 20px; }
+  .nl-step { flex: 1; text-align: center; font-size: 10px; color: var(--nl-muted); position: relative; }
+  .nl-step::before { content: attr(data-num); display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--nl-surface2); border: 1px solid var(--nl-border); margin: 0 auto 4px; line-height: 20px; font-size: 11px; }
+  .nl-step::after { content: ''; position: absolute; top: 10px; left: calc(50% + 11px); right: calc(-50% + 11px); height: 1px; background: var(--nl-border); }
+  .nl-step:last-child::after { display: none; }
+  .nl-step.done::before { background: var(--nl-accent2); border-color: var(--nl-accent2); color: #fff; }
+  .nl-step.active::before { background: var(--nl-accent); border-color: var(--nl-accent); color: #fff; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--nl-border); border-radius: 2px; }
+</style>
+
+<div id="nexloan-root">
+  <div class="nl-header">
+    <div class="nl-logo">
+      <div class="nl-logo-icon">🏦</div>
+      <div>
+        <div class="nl-logo-text">NexLoan</div>
+        <div class="nl-logo-sub">Personal Loan Origination System</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div id="nl-user-badge" style="display:none; font-size:12px; color:var(--nl-accent); background:rgba(99,179,136,0.1); padding:4px 12px; border-radius:20px; border:1px solid rgba(99,179,136,0.3);">
+        <span id="nl-user-name-display"></span>
+      </div>
+      <div class="nl-stage-indicator" id="stage-dots"></div>
+    </div>
+  </div>
+
+  <div class="nl-body">
+    <div class="nl-sidebar">
+      <div style="padding:10px 16px 6px; font-size:10px; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.6px;">Loan Lifecycle</div>
+      <div class="nl-nav-item active" data-page="inquiry" onclick="showPage('inquiry',this)"><span class="nl-nav-icon">💬</span>Inquiry & Lead</div>
+      <div class="nl-nav-item locked" id="nav-application" data-page="application" onclick="showPage('application',this)"><span class="nl-nav-icon">📋</span>Application + KYC</div>
+      <div class="nl-nav-item locked" id="nav-underwriting" data-page="underwriting" onclick="showPage('underwriting',this)"><span class="nl-nav-icon">🧠</span>AI Underwriting</div>
+      <div class="nl-nav-item locked" id="nav-disbursement" data-page="disbursement" onclick="showPage('disbursement',this)"><span class="nl-nav-icon">💸</span>Disbursement</div>
+      <div class="nl-nav-item locked" id="nav-servicing" data-page="servicing" onclick="showPage('servicing',this)"><span class="nl-nav-icon">📅</span>EMI Servicing</div>
+      <div class="nl-nav-item locked" id="nav-closure" data-page="closure" onclick="showPage('closure',this)"><span class="nl-nav-icon">🔒</span>Closure</div>
+      <div style="margin-top:auto; padding:10px 16px 6px; font-size:10px; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.6px; margin-top:20px;">Tools</div>
+      <div class="nl-nav-item" data-page="creditscoring" onclick="showPage('creditscoring',this)"><span class="nl-nav-icon">📊</span>Credit Scoring</div>
+      <div class="nl-nav-item" data-page="aiengine" onclick="showPage('aiengine',this)"><span class="nl-nav-icon">🤖</span>AI Engine</div>
+    </div>
+
+    <div class="nl-main">
+
+      <!-- PAGE: INQUIRY -->
+      <div class="nl-page active" id="page-inquiry">
+        <div class="nl-section-title">💬 Inquiry & Lead Generation</div>
+        <div class="nl-section-sub">Capture lead details and check quick eligibility</div>
+
+        <div class="nl-stepper">
+          <div class="nl-step active" data-num="1">Inquiry</div>
+          <div class="nl-step" data-num="2">Application</div>
+          <div class="nl-step" data-num="3">Underwriting</div>
+          <div class="nl-step" data-num="4">Disburse</div>
+          <div class="nl-step" data-num="5">Service</div>
+          <div class="nl-step" data-num="6">Close</div>
+        </div>
+
+        <div class="nl-form-grid">
+          <div class="nl-field">
+            <div class="nl-label">Full Name</div>
+            <input class="nl-input" id="inq-name" placeholder="Arjun Mehta" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Mobile Number</div>
+            <input class="nl-input" id="inq-mobile" placeholder="9876543210" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Monthly Income (₹)</div>
+            <input class="nl-input" type="number" id="inq-income" placeholder="75000" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Loan Amount (₹)</div>
+            <input class="nl-input" type="number" id="inq-amount" placeholder="500000" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Loan Purpose</div>
+            <select class="nl-input" id="inq-purpose">
+              <option>Medical Emergency</option>
+              <option>Home Renovation</option>
+              <option>Wedding</option>
+              <option>Education</option>
+              <option>Travel</option>
+              <option>Debt Consolidation</option>
+              <option>Business</option>
+            </select>
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Employment Type</div>
+            <select class="nl-input" id="inq-emp">
+              <option>Salaried</option>
+              <option>Self-Employed</option>
+              <option>Business Owner</option>
+              <option>Freelancer</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="inq-quick-result" style="display:none;" class="nl-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:13px; font-weight:500;">Quick Eligibility Check</span>
+            <span id="inq-eli-badge"></span>
+          </div>
+          <div class="nl-progress-bar"><div class="nl-progress-fill" id="inq-eli-bar" style="width:0%"></div></div>
+          <div id="inq-eli-msg" style="font-size:12px; color:var(--nl-muted); margin-top:8px;"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <button class="nl-btn nl-btn-secondary" onclick="checkQuickEligibility()">Check Eligibility</button>
+          <button class="nl-btn nl-btn-primary" onclick="proceedToApplication()">Proceed to Application →</button>
+        </div>
+      </div>
+
+      <!-- PAGE: APPLICATION -->
+      <div class="nl-page" id="page-application">
+        <div class="nl-section-title">📋 Full Application + KYC</div>
+        <div class="nl-section-sub">Detailed financial profile and document upload</div>
+
+        <div class="nl-form-grid">
+          <div class="nl-field">
+            <div class="nl-label">PAN Number</div>
+            <input class="nl-input" id="app-pan" placeholder="ABCDE1234F" style="text-transform:uppercase;" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Aadhaar Number</div>
+            <input class="nl-input" id="app-aadhaar" placeholder="1234 5678 9012" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Date of Birth</div>
+            <input class="nl-input" type="date" id="app-dob" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">City</div>
+            <input class="nl-input" id="app-city" placeholder="Bengaluru" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Existing EMI (₹/month)</div>
+            <input class="nl-input" type="number" id="app-existing-emi" placeholder="0" />
+          </div>
+          <div class="nl-field">
+            <div class="nl-label">Tenure Required (months)</div>
+            <select class="nl-input" id="app-tenure">
+              <option value="12">12 months</option>
+              <option value="24">24 months</option>
+              <option value="36" selected>36 months</option>
+              <option value="48">48 months</option>
+              <option value="60">60 months</option>
+            </select>
+          </div>
+          <div class="nl-field full">
+            <div class="nl-label">Residential Address</div>
+            <input class="nl-input" id="app-address" placeholder="123, MG Road, Bengaluru - 560001" />
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div class="nl-label" style="margin-bottom:8px;">Document Upload — PAN Card</div>
+          <div class="nl-upload-zone" onclick="simulateUpload('pan')">
+            <span class="nl-upload-icon">📄</span>
+            <div id="pan-upload-status">Click to upload PAN card image</div>
+            <div style="font-size:10px; margin-top:4px;">Supported: JPG, PNG, PDF</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div class="nl-label" style="margin-bottom:8px;">Document Upload — Aadhaar Card</div>
+          <div class="nl-upload-zone" onclick="simulateUpload('aadhaar')">
+            <span class="nl-upload-icon">🪪</span>
+            <div id="aadhaar-upload-status">Click to upload Aadhaar card image</div>
+            <div style="font-size:10px; margin-top:4px;">Front + Back required</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="nl-btn nl-btn-secondary" onclick="showPage('inquiry', document.querySelector('[data-page=inquiry]'))">← Back</button>
+          <button class="nl-btn nl-btn-primary" onclick="proceedToUnderwriting()">Submit for Underwriting →</button>
+        </div>
+      </div>
+
+      <!-- PAGE: UNDERWRITING -->
+      <div class="nl-page" id="page-underwriting">
+        <div class="nl-section-title">🧠 AI Underwriting & Approval</div>
+        <div class="nl-section-sub">Credit analysis, DTI check, and loan decision</div>
+
+        <div id="underwriting-loading" style="text-align:center; padding:40px;">
+          <div style="font-size:32px; margin-bottom:12px;">🤖</div>
+          <div style="font-size:14px; color:var(--nl-text); margin-bottom:8px;">Running AI Underwriting Engine</div>
+          <div style="font-size:12px; color:var(--nl-muted);">Analyzing income, DTI ratio, credit score, and documents...</div>
+          <div style="margin-top:16px;" id="uw-progress-container">
+            <div class="nl-progress-bar"><div class="nl-progress-fill" id="uw-progress" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div id="underwriting-result" style="display:none;">
+          <div class="nl-stat-grid">
+            <div class="nl-stat">
+              <div class="nl-stat-val" id="uw-dti">--</div>
+              <div class="nl-stat-lbl">DTI Ratio</div>
+            </div>
+            <div class="nl-stat">
+              <div class="nl-stat-val" id="uw-rate">--</div>
+              <div class="nl-stat-lbl">Interest Rate</div>
+            </div>
+            <div class="nl-stat">
+              <div class="nl-stat-val" id="uw-emi">--</div>
+              <div class="nl-stat-lbl">Monthly EMI</div>
+            </div>
+          </div>
+
+          <div class="nl-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div style="font-size:13px; font-weight:500;">Underwriting Decision</div>
+              <span id="uw-decision-badge"></span>
+            </div>
+            <div id="uw-decision-text" style="font-size:12px; color:var(--nl-muted); line-height:1.6;"></div>
+          </div>
+
+          <div class="nl-card" id="uw-conditions-card" style="display:none;">
+            <div style="font-size:12px; font-weight:500; margin-bottom:8px;">Conditions / Remarks</div>
+            <div id="uw-conditions" style="font-size:12px; color:var(--nl-muted); line-height:1.6;"></div>
+          </div>
+
+          <div class="nl-ai-box">
+            <div class="nl-ai-label">AI Underwriting Analysis</div>
+            <div class="nl-ai-response" id="uw-ai-analysis">Running analysis...</div>
+          </div>
+
+          <div style="margin-top:16px; display:flex; gap:10px;" id="uw-action-btns" style="display:none;">
+            <button class="nl-btn nl-btn-primary" onclick="proceedToDisbursement()">Approve & Disburse →</button>
+            <button class="nl-btn nl-btn-danger" onclick="showPage('inquiry', document.querySelector('[data-page=inquiry]'))">Reject & Restart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: DISBURSEMENT -->
+      <div class="nl-page" id="page-disbursement">
+        <div class="nl-section-title">💸 Disbursement</div>
+        <div class="nl-section-sub">Simulated loan payout to borrower account</div>
+
+        <div class="nl-card">
+          <div style="font-size:12px; font-weight:500; margin-bottom:12px;">Disbursement Details</div>
+          <div class="nl-form-grid">
+            <div class="nl-field">
+              <div class="nl-label">Bank Account</div>
+              <input class="nl-input" id="disb-account" placeholder="HDFC Bank - XXXX1234" />
+            </div>
+            <div class="nl-field">
+              <div class="nl-label">IFSC Code</div>
+              <input class="nl-input" id="disb-ifsc" placeholder="HDFC0001234" />
+            </div>
+            <div class="nl-field">
+              <div class="nl-label">Account Holder Name</div>
+              <input class="nl-input" id="disb-acname" placeholder="Same as applicant" />
+            </div>
+            <div class="nl-field">
+              <div class="nl-label">Transfer Mode</div>
+              <select class="nl-input" id="disb-mode">
+                <option>NEFT</option>
+                <option>IMPS</option>
+                <option>RTGS</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="disb-summary" class="nl-card">
+          <div style="font-size:12px; font-weight:500; margin-bottom:10px;">Loan Summary</div>
+          <div class="nl-emi-row"><span style="color:var(--nl-muted)">Approved Amount</span><span id="disb-loan-amt" style="font-weight:500">--</span></div>
+          <div class="nl-emi-row"><span style="color:var(--nl-muted)">Net Disbursement</span><span id="disb-net-amt" style="color:var(--nl-accent); font-weight:500">--</span></div>
+          <div class="nl-emi-row"><span style="color:var(--nl-muted)">Processing Fee (2%)</span><span id="disb-fee" style="color:var(--nl-gold)">--</span></div>
+          <div class="nl-emi-row"><span style="color:var(--nl-muted)">EMI Start Date</span><span id="disb-emi-date">Next month 5th</span></div>
+        </div>
+
+        <div id="disb-result" style="display:none;" class="nl-success-screen">
+          <div class="nl-success-icon">✅</div>
+          <div class="nl-success-title">Amount Disbursed!</div>
+          <div class="nl-success-sub" id="disb-success-msg"></div>
+        </div>
+
+        <div style="display:flex; gap:10px;" id="disb-btn-row">
+          <button class="nl-btn nl-btn-primary" onclick="simulateDisbursement()">Initiate Disbursement</button>
+        </div>
+      </div>
+
+      <!-- PAGE: SERVICING -->
+      <div class="nl-page" id="page-servicing">
+        <div class="nl-section-title">📅 EMI Servicing</div>
+        <div class="nl-section-sub">Monthly EMI schedule and payment simulation</div>
+
+        <div class="nl-toggle-row">
+          <div class="nl-toggle active" onclick="switchServicingView('schedule',this)">EMI Schedule</div>
+          <div class="nl-toggle" onclick="switchServicingView('payment',this)">Make Payment</div>
+          <div class="nl-toggle" onclick="switchServicingView('statement',this)">Account Statement</div>
+        </div>
+
+        <div id="serv-schedule">
+          <div class="nl-stat-grid">
+            <div class="nl-stat">
+              <div class="nl-stat-val" id="serv-paid">0</div>
+              <div class="nl-stat-lbl">EMIs Paid</div>
+            </div>
+            <div class="nl-stat">
+              <div class="nl-stat-val" id="serv-pending">--</div>
+              <div class="nl-stat-lbl">EMIs Pending</div>
+            </div>
+            <div class="nl-stat">
+              <div class="nl-stat-val" id="serv-outstanding">--</div>
+              <div class="nl-stat-lbl">Outstanding (₹)</div>
+            </div>
+          </div>
+          <div id="emi-table-container" style="max-height:220px; overflow-y:auto;"></div>
+        </div>
+
+        <div id="serv-payment" style="display:none;">
+          <div class="nl-card">
+            <div style="font-size:13px; font-weight:500; margin-bottom:12px;">Pay EMI</div>
+            <div class="nl-form-grid">
+              <div class="nl-field">
+                <div class="nl-label">EMI Month</div>
+                <select class="nl-input" id="pay-month"></select>
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Amount (₹)</div>
+                <input class="nl-input" id="pay-amount" readonly />
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Payment Method</div>
+                <select class="nl-input">
+                  <option>UPI</option>
+                  <option>Net Banking</option>
+                  <option>Debit Card</option>
+                  <option>NACH Auto-Debit</option>
+                </select>
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">UPI ID / Reference</div>
+                <input class="nl-input" placeholder="arjun@paytm" />
+              </div>
+            </div>
+            <div id="pay-result" style="display:none; margin-top:10px;"></div>
+            <button class="nl-btn nl-btn-primary" onclick="simulatePayment()" style="margin-top:8px;">Pay Now</button>
+          </div>
+        </div>
+
+        <div id="serv-statement" style="display:none;">
+          <div id="statement-container"></div>
+        </div>
+      </div>
+
+      <!-- PAGE: CLOSURE -->
+      <div class="nl-page" id="page-closure">
+        <div class="nl-section-title">🔒 Loan Closure / Pre-closure</div>
+        <div class="nl-section-sub">Full settlement, pre-closure calculation, and NOC generation</div>
+
+        <div class="nl-toggle-row">
+          <div class="nl-toggle active" onclick="switchClosureView('normal',this)">Normal Closure</div>
+          <div class="nl-toggle" onclick="switchClosureView('preclosure',this)">Pre-closure</div>
+        </div>
+
+        <div id="close-normal">
+          <div class="nl-card">
+            <div style="font-size:13px; font-weight:500; margin-bottom:10px;">Closure Status</div>
+            <div id="close-normal-content"></div>
+          </div>
+          <button class="nl-btn nl-btn-primary" onclick="generateNOC()" style="margin-top:8px;">Generate No-Dues Certificate</button>
+        </div>
+
+        <div id="close-preclosure" style="display:none;">
+          <div class="nl-card">
+            <div style="font-size:13px; font-weight:500; margin-bottom:10px;">Pre-closure Calculator</div>
+            <div class="nl-form-grid">
+              <div class="nl-field">
+                <div class="nl-label">Closure Month</div>
+                <select class="nl-input" id="preclosure-month"></select>
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Penalty (3%)</div>
+                <input class="nl-input" id="preclosure-penalty" readonly />
+              </div>
+              <div class="nl-field full">
+                <div class="nl-label">Total Pre-closure Amount</div>
+                <input class="nl-input" id="preclosure-total" readonly style="font-size:16px; font-weight:600; color:var(--nl-gold);" />
+              </div>
+            </div>
+            <button class="nl-btn nl-btn-primary" onclick="executePreclosure()" style="margin-top:8px;">Execute Pre-closure</button>
+          </div>
+        </div>
+
+        <div id="noc-preview" style="display:none;">
+          <div class="nl-email-preview" id="noc-content"></div>
+        </div>
+      </div>
+
+      <!-- PAGE: CREDIT SCORING -->
+      <div class="nl-page" id="page-creditscoring">
+        <div class="nl-section-title">📊 Theoremlabs Credit Score Simulator</div>
+        <div class="nl-section-sub">Proprietary scoring algorithm to determine interest rate eligibility</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <div>
+            <div class="nl-form-grid" style="grid-template-columns:1fr;">
+              <div class="nl-field">
+                <div class="nl-label">Age</div>
+                <input class="nl-input" type="number" id="cs-age" placeholder="32" oninput="calcScore()" />
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Monthly Income (₹)</div>
+                <input class="nl-input" type="number" id="cs-income" placeholder="80000" oninput="calcScore()" />
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Existing EMIs (₹/month)</div>
+                <input class="nl-input" type="number" id="cs-emis" placeholder="5000" oninput="calcScore()" />
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Years at Current Job</div>
+                <input class="nl-input" type="number" id="cs-tenure" placeholder="3" oninput="calcScore()" />
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Previous Loan Defaults</div>
+                <select class="nl-input" id="cs-defaults" onchange="calcScore()">
+                  <option value="0">None</option>
+                  <option value="1">1 default</option>
+                  <option value="2">2+ defaults</option>
+                </select>
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Property Owned</div>
+                <select class="nl-input" id="cs-property" onchange="calcScore()">
+                  <option value="1">Yes</option>
+                  <option value="0">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align:center; padding-top:16px;">
+            <div class="nl-score-ring" id="score-ring" style="border-color: #333;">
+              <div class="nl-score-val" id="cs-score-val">--</div>
+              <div class="nl-score-lbl">TL Score</div>
+            </div>
+            <div id="cs-score-label" style="font-size:13px; font-weight:500; margin-bottom:16px; color:var(--nl-muted);">Enter details</div>
+
+            <table class="nl-rate-table">
+              <tr><th>Score Range</th><th>Category</th><th>Interest Rate</th></tr>
+              <tr id="csr-excel"><td>800–900</td><td>Excellent</td><td>10.5%</td></tr>
+              <tr id="csr-good"><td>700–799</td><td>Good</td><td>12.5%</td></tr>
+              <tr id="csr-fair"><td>600–699</td><td>Fair</td><td>15.0%</td></tr>
+              <tr id="csr-poor"><td>500–599</td><td>Poor</td><td>18.0%</td></tr>
+              <tr id="csr-bad"><td>&lt;500</td><td>Bad</td><td>Reject</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: AI ENGINE -->
+      <div class="nl-page" id="page-aiengine">
+        <div class="nl-section-title">🤖 AI Document Engine</div>
+        <div class="nl-section-sub">OCR extraction, completeness check, and identity fraud detection</div>
+
+        <div class="nl-toggle-row">
+          <div class="nl-toggle active" onclick="switchAIView('ocr',this)">OCR Extraction</div>
+          <div class="nl-toggle" onclick="switchAIView('fraud',this)">Identity Fraud Check</div>
+          <div class="nl-toggle" onclick="switchAIView('completeness',this)">Completeness Check</div>
+        </div>
+
+        <div id="ai-ocr">
+          <div class="nl-upload-zone" onclick="runOCR()" style="margin-bottom:12px;">
+            <span class="nl-upload-icon">🔍</span>
+            <div>Click to simulate OCR on uploaded PAN / Aadhaar</div>
+            <div style="font-size:10px; margin-top:4px;">Uses AI to extract Name, DOB, ID Number, Photo presence</div>
+          </div>
+          <div id="ocr-result" class="nl-ai-box" style="display:none;">
+            <div class="nl-ai-label">OCR Extraction Result</div>
+            <div class="nl-ai-response" id="ocr-text"></div>
+          </div>
+        </div>
+
+        <div id="ai-fraud" style="display:none;">
+          <div class="nl-card">
+            <div style="font-size:13px; font-weight:500; margin-bottom:12px;">Name Cross-Verification</div>
+            <div class="nl-form-grid">
+              <div class="nl-field">
+                <div class="nl-label">Name on Application</div>
+                <input class="nl-input" id="fraud-app-name" placeholder="Arjun Mehta" />
+              </div>
+              <div class="nl-field">
+                <div class="nl-label">Name Extracted from PAN (OCR)</div>
+                <input class="nl-input" id="fraud-pan-name" placeholder="ARJUN MEHTA" />
+              </div>
+            </div>
+            <button class="nl-btn nl-btn-primary" onclick="runFraudCheck()" style="margin-top:4px;">Run AI Fraud Check</button>
+            <div id="fraud-result" class="nl-ai-box" style="display:none; margin-top:12px;">
+              <div class="nl-ai-label">Fraud Detection Result</div>
+              <div class="nl-ai-response" id="fraud-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ai-completeness" style="display:none;">
+          <div id="completeness-result" class="nl-card"></div>
+          <button class="nl-btn nl-btn-primary" onclick="runCompletenessCheck()" style="margin-top:4px;">Run Completeness Check</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<button class="nl-chatbot-btn" onclick="toggleChat()" id="chat-fab">💬</button>
+
+<div class="nl-chatbot-window hidden" id="chat-window">
+  <div class="nl-chat-header">
+    <div>
+      <div class="nl-chat-title">NexLoan Assistant</div>
+      <div style="font-size:10px; color:var(--nl-accent);">● Online</div>
+    </div>
+    <button class="nl-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="nl-chat-messages" id="chat-messages"></div>
+  <div id="chat-otp-section" style="display:none; padding:10px 12px; border-top:1px solid var(--nl-border);">
+    <div style="font-size:12px; color:var(--nl-muted); margin-bottom:8px;">Enter OTP sent to your mobile</div>
+    <div class="nl-otp-input">
+      <input class="nl-otp-digit" maxlength="1" id="otp0" oninput="otpNext(0)" />
+      <input class="nl-otp-digit" maxlength="1" id="otp1" oninput="otpNext(1)" />
+      <input class="nl-otp-digit" maxlength="1" id="otp2" oninput="otpNext(2)" />
+      <input class="nl-otp-digit" maxlength="1" id="otp3" oninput="otpNext(3)" />
+    </div>
+    <button class="nl-btn nl-btn-primary" style="width:100%; font-size:12px;" onclick="verifyOTP()">Verify OTP</button>
+    <div style="font-size:10px; color:var(--nl-muted); margin-top:6px; text-align:center;">(hint: use 1234)</div>
+  </div>
+  <div class="nl-chat-input-row">
+    <input class="nl-chat-input" id="chat-input" placeholder="Ask about your loan..." onkeydown="if(event.key==='Enter')sendChat()" />
+    <button class="nl-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+let loanData = {
+  name: '', mobile: '', income: 0, amount: 0, purpose: '',
+  employment: '', pan: '', aadhaar: '', tenure: 36,
+  existingEMI: 0, creditScore: 0, interestRate: 0,
+  emiAmount: 0, approved: false, disbursed: false,
+  paidEMIs: 0, city: '', address: ''
+};
+
+let chatState = { awaitingLogin: false, loggedIn: false, otpSent: false };
+
+function showPage(pageId, navEl) {
+  document.querySelectorAll('.nl-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nl-nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + pageId);
+  if (pg) pg.classList.add('active');
+  if (navEl && !navEl.classList.contains('locked')) navEl.classList.add('active');
+  updateStageDots();
+  if (pageId === 'servicing') initServicing();
+  if (pageId === 'closure') initClosure();
+  if (pageId === 'disbursement') initDisbursement();
+}
+
+function updateStageDots() {
+  const stages = ['inquiry','application','underwriting','disbursement','servicing','closure'];
+  const container = document.getElementById('stage-dots');
+  container.innerHTML = '';
+  stages.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'nl-stage-dot';
+    const activePage = document.querySelector('.nl-page.active');
+    if (activePage) {
+      const activeId = activePage.id.replace('page-', '');
+      const ai = stages.indexOf(activeId);
+      if (i < ai) d.classList.add('done');
+      else if (i === ai) d.classList.add('active');
+    }
+    container.appendChild(d);
+  });
+}
+
+function checkQuickEligibility() {
+  const name = document.getElementById('inq-name').value;
+  const income = parseFloat(document.getElementById('inq-income').value) || 0;
+  const amount = parseFloat(document.getElementById('inq-amount').value) || 0;
+  if (!name || !income || !amount) { alert('Please fill Name, Income, and Loan Amount'); return; }
+  loanData.name = name;
+  loanData.income = income;
+  loanData.amount = amount;
+  loanData.mobile = document.getElementById('inq-mobile').value;
+  loanData.purpose = document.getElementById('inq-purpose').value;
+  loanData.employment = document.getElementById('inq-emp').value;
+
+  const maxLoan = income * 24;
+  const ratio = amount / maxLoan;
+  const result = document.getElementById('inq-quick-result');
+  result.style.display = 'block';
+  const bar = document.getElementById('inq-eli-bar');
+  const badge = document.getElementById('inq-eli-badge');
+  const msg = document.getElementById('inq-eli-msg');
+
+  if (amount <= maxLoan * 0.6) {
+    bar.style.width = '90%';
+    badge.outerHTML = '<span class="nl-badge nl-badge-success" id="inq-eli-badge">Likely Eligible</span>';
+    msg.innerHTML = `Based on your income of ₹${income.toLocaleString()}/month, you qualify for up to ₹${Math.round(maxLoan).toLocaleString()}. Your requested ₹${amount.toLocaleString()} looks feasible.`;
+  } else if (amount <= maxLoan) {
+    bar.style.width = '55%';
+    badge.outerHTML = '<span class="nl-badge nl-badge-warning" id="inq-eli-badge">Borderline</span>';
+    msg.innerHTML = `Your loan-to-income ratio is high. A higher credit score or co-applicant may help secure approval.`;
+  } else {
+    bar.style.width = '20%';
+    badge.outerHTML = '<span class="nl-badge nl-badge-danger" id="inq-eli-badge">Likely Ineligible</span>';
+    msg.innerHTML = `Requested amount exceeds maximum eligible limit of ₹${Math.round(maxLoan).toLocaleString()} based on your income.`;
+  }
+}
+
+function proceedToApplication() {
+  if (!loanData.name) { checkQuickEligibility(); return; }
+  unlockNav('nav-application');
+  showPage('application', document.getElementById('nav-application'));
+}
+
+function unlockNav(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('locked');
+}
+
+function simulateUpload(type) {
+  const el = document.getElementById(type + '-upload-status');
+  el.innerHTML = '✅ ' + (type === 'pan' ? 'PAN' : 'Aadhaar') + ' uploaded successfully — AI processing queued';
+  el.style.color = 'var(--nl-accent)';
+}
+
+function calcEMI(principal, rate, months) {
+  const r = rate / 1200;
+  return principal * r * Math.pow(1+r, months) / (Math.pow(1+r, months) - 1);
+}
+
+function calcCreditScore(income, emis, age, jobTenure, defaults, property) {
+  let score = 500;
+  if (income >= 100000) score += 120;
+  else if (income >= 60000) score += 90;
+  else if (income >= 40000) score += 60;
+  else if (income >= 25000) score += 30;
+
+  const dti = emis / income;
+  if (dti < 0.1) score += 80;
+  else if (dti < 0.2) score += 50;
+  else if (dti < 0.35) score += 20;
+  else score -= 40;
+
+  if (age >= 25 && age <= 55) score += 40;
+  else if (age >= 22 && age < 25) score += 20;
+  else score -= 20;
+
+  if (jobTenure >= 5) score += 60;
+  else if (jobTenure >= 2) score += 35;
+  else score += 10;
+
+  if (defaults === 0) score += 50;
+  else if (defaults === 1) score -= 80;
+  else score -= 150;
+
+  if (property == 1) score += 40;
+
+  return Math.min(900, Math.max(300, score));
+}
+
+function getRateFromScore(score) {
+  if (score >= 800) return 10.5;
+  if (score >= 700) return 12.5;
+  if (score >= 600) return 15.0;
+  if (score >= 500) return 18.0;
+  return null;
+}
+
+function proceedToUnderwriting() {
+  loanData.pan = document.getElementById('app-pan').value || 'ABCDE1234F';
+  loanData.aadhaar = document.getElementById('app-aadhaar').value;
+  loanData.existingEMI = parseFloat(document.getElementById('app-existing-emi').value) || 0;
+  loanData.tenure = parseInt(document.getElementById('app-tenure').value) || 36;
+  loanData.city = document.getElementById('app-city').value;
+  loanData.address = document.getElementById('app-address').value;
+
+  unlockNav('nav-underwriting');
+  showPage('underwriting', document.getElementById('nav-underwriting'));
+
+  document.getElementById('underwriting-loading').style.display = 'block';
+  document.getElementById('underwriting-result').style.display = 'none';
+
+  let pct = 0;
+  const bar = document.getElementById('uw-progress');
+  const interval = setInterval(() => {
+    pct += Math.random() * 18;
+    if (pct >= 100) { pct = 100; clearInterval(interval); showUnderwritingResult(); }
+    bar.style.width = Math.min(pct, 100) + '%';
+  }, 180);
+}
+
+async function showUnderwritingResult() {
+  document.getElementById('underwriting-loading').style.display = 'none';
+  document.getElementById('underwriting-result').style.display = 'block';
+
+  const score = calcCreditScore(loanData.income, loanData.existingEMI, 32, 3, 0, 1);
+  loanData.creditScore = score;
+  const rate = getRateFromScore(score);
+  loanData.interestRate = rate;
+
+  const proposedEMI = rate ? calcEMI(loanData.amount, rate, loanData.tenure) : 0;
+  loanData.emiAmount = proposedEMI;
+  const totalObligation = loanData.existingEMI + proposedEMI;
+  const dti = totalObligation / loanData.income;
+
+  document.getElementById('uw-dti').textContent = (dti * 100).toFixed(1) + '%';
+  document.getElementById('uw-rate').textContent = rate ? rate + '%' : 'N/A';
+  document.getElementById('uw-emi').textContent = rate ? '₹' + Math.round(proposedEMI).toLocaleString() : 'N/A';
+
+  const approved = rate && dti <= 0.55 && score >= 550;
+  loanData.approved = approved;
+
+  const badge = document.getElementById('uw-decision-badge');
+  const text = document.getElementById('uw-decision-text');
+  if (approved) {
+    badge.innerHTML = '<span class="nl-badge nl-badge-success">APPROVED</span>';
+    text.innerHTML = `Loan of ₹${loanData.amount.toLocaleString()} approved at ${rate}% p.a. for ${loanData.tenure} months.<br>Monthly EMI: ₹${Math.round(proposedEMI).toLocaleString()}<br>Credit Score: ${score} (${score >= 800 ? 'Excellent' : score >= 700 ? 'Good' : score >= 600 ? 'Fair' : 'Poor'})`;
+  } else {
+    badge.innerHTML = '<span class="nl-badge nl-badge-danger">DECLINED</span>';
+    text.innerHTML = `Loan declined. DTI ratio ${(dti*100).toFixed(1)}% exceeds limit (55%) or credit score ${score} insufficient.<br>Suggest reducing loan amount or improving credit profile.`;
+    document.getElementById('uw-conditions-card').style.display = 'block';
+    document.getElementById('uw-conditions').textContent = 'Improve credit utilization, reduce existing obligations, or provide a guarantor.';
+  }
+
+  document.getElementById('uw-action-btns').style.display = 'flex';
+
+  const aiBox = document.getElementById('uw-ai-analysis');
+  aiBox.textContent = 'Generating AI analysis...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        messages: [{
+          role: 'user',
+          content: `You are an AI underwriter at NexLoan. Analyze this loan application and provide a 3-4 line professional assessment:
+Applicant: ${loanData.name || 'Applicant'}, Income: ₹${loanData.income}/month, Loan: ₹${loanData.amount}, Tenure: ${loanData.tenure}mo, Employment: ${loanData.employment || 'Salaried'}, Existing EMI: ₹${loanData.existingEMI}, DTI: ${(dti*100).toFixed(1)}%, Credit Score: ${score}, Decision: ${approved ? 'APPROVED' : 'DECLINED'}.
+Give a professional credit assessment in 3-4 lines. Be specific about risk factors.`
+        }]
+      })
+    });
+    const data = await res.json();
+    aiBox.textContent = data.content?.[0]?.text || 'Analysis unavailable.';
+  } catch(e) {
+    aiBox.textContent = `Credit assessment: Score ${score} with DTI ${(dti*100).toFixed(1)}%. ${approved ? 'Risk profile acceptable. Recommend standard monitoring post-disbursement.' : 'Risk profile exceeds thresholds. Manual review recommended.'}`;
+  }
+}
+
+function proceedToDisbursement() {
+  if (!loanData.approved) { alert('Loan not approved'); return; }
+  unlockNav('nav-disbursement');
+  showPage('disbursement', document.getElementById('nav-disbursement'));
+}
+
+function initDisbursement() {
+  document.getElementById('disb-acname').value = loanData.name || '';
+  const fee = Math.round(loanData.amount * 0.02);
+  document.getElementById('disb-loan-amt').textContent = '₹' + loanData.amount.toLocaleString();
+  document.getElementById('disb-fee').textContent = '- ₹' + fee.toLocaleString();
+  document.getElementById('disb-net-amt').textContent = '₹' + (loanData.amount - fee).toLocaleString();
+}
+
+function simulateDisbursement() {
+  const account = document.getElementById('disb-account').value;
+  const ifsc = document.getElementById('disb-ifsc').value;
+  if (!account || !ifsc) { alert('Please enter bank account details'); return; }
+  document.getElementById('disb-btn-row').style.display = 'none';
+  document.getElementById('disb-result').style.display = 'block';
+  const fee = Math.round(loanData.amount * 0.02);
+  const net = loanData.amount - fee;
+  document.getElementById('disb-success-msg').innerHTML = `₹${net.toLocaleString()} credited to account<br><span style="font-family:var(--nl-mono); color:var(--nl-accent)">${account} (${document.getElementById('disb-mode').value})</span><br><br>UTR: NXL${Date.now().toString().slice(-8)}<br>Your first EMI of ₹${Math.round(loanData.emiAmount).toLocaleString()} is due on the 5th of next month.`;
+  loanData.disbursed = true;
+  unlockNav('nav-servicing');
+  unlockNav('nav-closure');
+  document.getElementById('nl-user-badge').style.display = 'flex';
+  document.getElementById('nl-user-name-display').textContent = loanData.name || 'Borrower';
+}
+
+function initServicing() {
+  if (!loanData.disbursed) { document.getElementById('emi-table-container').innerHTML = '<div style="color:var(--nl-muted); font-size:12px; text-align:center; padding:20px;">Complete disbursement first</div>'; return; }
+  generateEMITable();
+}
+
+function generateEMITable() {
+  const principal = loanData.amount;
+  const rate = loanData.interestRate / 1200;
+  const n = loanData.tenure;
+  const emi = loanData.emiAmount;
+  let balance = principal;
+  let rows = `<table style="width:100%; border-collapse:collapse; font-size:11px;">
+    <thead><tr style="background:var(--nl-surface2);">
+      <th style="padding:6px 8px; text-align:left; color:var(--nl-muted);">Month</th>
+      <th style="padding:6px 8px; text-align:right; color:var(--nl-muted);">EMI</th>
+      <th style="padding:6px 8px; text-align:right; color:var(--nl-muted);">Principal</th>
+      <th style="padding:6px 8px; text-align:right; color:var(--nl-muted);">Interest</th>
+      <th style="padding:6px 8px; text-align:right; color:var(--nl-muted);">Balance</th>
+      <th style="padding:6px 8px; text-align:center; color:var(--nl-muted);">Status</th>
+    </tr></thead><tbody>`;
+
+  const paidEMIs = loanData.paidEMIs;
+  const today = new Date();
+
+  for (let i = 1; i <= n; i++) {
+    const interest = balance * rate;
+    const princ = emi - interest;
+    balance -= princ;
+    const monthDate = new Date(today);
+    monthDate.setMonth(today.getMonth() + i);
+    const status = i <= paidEMIs ? `<span class="nl-badge nl-badge-success">Paid</span>` : `<span class="nl-badge nl-badge-warning">Due</span>`;
+    rows += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+      <td style="padding:5px 8px;">${monthDate.toLocaleString('default',{month:'short',year:'2-digit'})}</td>
+      <td style="padding:5px 8px; text-align:right; font-family:var(--nl-mono);">₹${Math.round(emi).toLocaleString()}</td>
+      <td style="padding:5px 8px; text-align:right; color:var(--nl-accent); font-family:var(--nl-mono);">₹${Math.round(princ).toLocaleString()}</td>
+      <td style="padding:5px 8px; text-align:right; color:var(--nl-gold); font-family:var(--nl-mono);">₹${Math.round(interest).toLocaleString()}</td>
+      <td style="padding:5px 8px; text-align:right; font-family:var(--nl-mono);">₹${Math.max(0,Math.round(balance)).toLocaleString()}</td>
+      <td style="padding:5px 8px; text-align:center;">${status}</td>
+    </tr>`;
+  }
+  rows += '</tbody></table>';
+  document.getElementById('emi-table-container').innerHTML = rows;
+
+  document.getElementById('serv-paid').textContent = paidEMIs;
+  document.getElementById('serv-pending').textContent = n - paidEMIs;
+
+  let outstanding = loanData.amount;
+  let bal = principal;
+  for (let i = 1; i <= paidEMIs; i++) {
+    const int = bal * rate;
+    bal -= (emi - int);
+  }
+  document.getElementById('serv-outstanding').textContent = '₹' + Math.max(0, Math.round(bal)).toLocaleString();
+
+  const payMonth = document.getElementById('pay-month');
+  payMonth.innerHTML = '';
+  const today2 = new Date();
+  for (let i = paidEMIs + 1; i <= Math.min(paidEMIs + 3, n); i++) {
+    const d = new Date(today2); d.setMonth(today2.getMonth() + i);
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Month ${i} — ${d.toLocaleString('default',{month:'long',year:'numeric'})}`;
+    payMonth.appendChild(opt);
+  }
+  document.getElementById('pay-amount').value = '₹' + Math.round(emi).toLocaleString();
+}
+
+function switchServicingView(view, el) {
+  document.querySelectorAll('#serv-schedule, #serv-payment, #serv-statement').forEach(e => e.style.display = 'none');
+  document.getElementById('serv-' + view).style.display = 'block';
+  document.querySelectorAll('.nl-toggle-row .nl-toggle').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (view === 'statement') generateStatement();
+}
+
+function generateStatement() {
+  const paid = loanData.paidEMIs;
+  let html = `<div class="nl-card"><div style="font-size:12px; font-weight:500; margin-bottom:10px;">Transaction History — ${paid} payment(s) on record</div>`;
+  for (let i = 1; i <= paid; i++) {
+    const d = new Date(); d.setMonth(d.getMonth() - (paid - i + 1));
+    html += `<div class="nl-emi-row"><span style="color:var(--nl-muted)">EMI #${i} — ${d.toLocaleDateString()}</span><span style="color:var(--nl-accent); font-family:var(--nl-mono)">₹${Math.round(loanData.emiAmount).toLocaleString()} ✓</span></div>`;
+  }
+  if (!paid) html += `<div style="font-size:12px; color:var(--nl-muted);">No payments recorded yet.</div>`;
+  html += '</div>';
+  document.getElementById('statement-container').innerHTML = html;
+}
+
+function simulatePayment() {
+  loanData.paidEMIs++;
+  document.getElementById('pay-result').style.display = 'block';
+  document.getElementById('pay-result').innerHTML = `<div class="nl-badge nl-badge-success">✓ Payment of ₹${Math.round(loanData.emiAmount).toLocaleString()} received — Ref: NXL${Date.now().toString().slice(-6)}</div>`;
+  generateEMITable();
+  if (loanData.paidEMIs >= loanData.tenure) {
+    setTimeout(() => alert('🎉 Loan fully repaid! Proceed to Closure to generate NOC.'), 500);
+  }
+}
+
+function initClosure() {
+  const remaining = loanData.tenure - loanData.paidEMIs;
+  const html = `<div class="nl-emi-row"><span style="color:var(--nl-muted)">Total EMIs</span><span>${loanData.tenure}</span></div>
+    <div class="nl-emi-row"><span style="color:var(--nl-muted)">Paid EMIs</span><span style="color:var(--nl-accent)">${loanData.paidEMIs}</span></div>
+    <div class="nl-emi-row"><span style="color:var(--nl-muted)">Remaining</span><span style="color:var(--nl-gold)">${remaining}</span></div>
+    <div class="nl-emi-row"><span style="color:var(--nl-muted)">Closure Status</span><span>${remaining === 0 ? '<span class="nl-badge nl-badge-success">Eligible for Closure</span>' : '<span class="nl-badge nl-badge-warning">In Progress</span>'}</span></div>`;
+  document.getElementById('close-normal-content').innerHTML = html;
+
+  const sel = document.getElementById('preclosure-month');
+  sel.innerHTML = '';
+  for (let i = loanData.paidEMIs + 1; i <= loanData.tenure; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `After Month ${i}`;
+    sel.appendChild(opt);
+  }
+  sel.onchange = updatePreclosureCalc;
+  updatePreclosureCalc();
+}
+
+function updatePreclosureCalc() {
+  const month = parseInt(document.getElementById('preclosure-month').value) || loanData.paidEMIs + 1;
+  const rate = loanData.interestRate / 1200;
+  const emi = loanData.emiAmount;
+  let bal = loanData.amount;
+  for (let i = 1; i <= month; i++) {
+    const int = bal * rate;
+    bal -= (emi - int);
+  }
+  const outstanding = Math.max(0, bal);
+  const penalty = outstanding * 0.03;
+  const total = outstanding + penalty;
+  document.getElementById('preclosure-penalty').value = '₹' + Math.round(penalty).toLocaleString();
+  document.getElementById('preclosure-total').value = '₹' + Math.round(total).toLocaleString();
+}
+
+function switchClosureView(view, el) {
+  document.getElementById('close-normal').style.display = view === 'normal' ? 'block' : 'none';
+  document.getElementById('close-preclosure').style.display = view === 'preclosure' ? 'block' : 'none';
+  document.querySelectorAll('#page-closure .nl-toggle').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function executePreclosure() {
+  loanData.paidEMIs = loanData.tenure;
+  generateNOC();
+  alert('Pre-closure executed successfully! NOC generated below.');
+}
+
+function generateNOC() {
+  const preview = document.getElementById('noc-preview');
+  const content = document.getElementById('noc-content');
+  const today = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'});
+  content.innerHTML = `
+    <h3>NexLoan — No Objection Certificate (NOC)</h3>
+    <p><strong>Date:</strong> ${today}</p>
+    <p><strong>Ref:</strong> NXL-${Math.random().toString(36).substr(2,8).toUpperCase()}</p>
+    <hr style="margin:12px 0; border:none; border-top:1px solid #ddd;">
+    <p>To Whomsoever It May Concern,</p>
+    <p>This is to certify that <strong>${loanData.name || 'the Borrower'}</strong> had availed a Personal Loan of <strong>₹${loanData.amount.toLocaleString()}</strong> from <strong>NexLoan Financial Services</strong> vide Loan Account No. <strong>NXL${Date.now().toString().slice(-8)}</strong>.</p>
+    <p>We are pleased to confirm that the above-mentioned loan has been <strong>fully repaid</strong> as on ${today}. There are no outstanding dues, charges, or liabilities against the said borrower on account of the above loan.</p>
+    <p>This No Dues Certificate / NOC is issued at the request of the borrower for use as required.</p>
+    <p style="margin-top:20px;"><strong>NexLoan Financial Services Pvt. Ltd.</strong><br>Authorised Signatory<br><em>Digitally Verified ✓</em></p>
+  `;
+  preview.style.display = 'block';
+}
+
+function calcScore() {
+  const age = parseInt(document.getElementById('cs-age').value) || 0;
+  const income = parseFloat(document.getElementById('cs-income').value) || 0;
+  const emis = parseFloat(document.getElementById('cs-emis').value) || 0;
+  const tenure = parseFloat(document.getElementById('cs-tenure').value) || 0;
+  const defaults = parseInt(document.getElementById('cs-defaults').value) || 0;
+  const property = parseInt(document.getElementById('cs-property').value) || 0;
+
+  if (!income) return;
+  const score = calcCreditScore(income, emis, age, tenure, defaults, property);
+  const ring = document.getElementById('score-ring');
+  const val = document.getElementById('cs-score-val');
+  const lbl = document.getElementById('cs-score-label');
+
+  val.textContent = score;
+
+  document.querySelectorAll('[id^="csr-"]').forEach(r => r.classList.remove('highlight'));
+  if (score >= 800) { ring.style.borderColor='#63b388'; val.style.color='#63b388'; lbl.textContent='Excellent — 10.5% p.a.'; lbl.style.color='#63b388'; document.getElementById('csr-excel').classList.add('highlight'); }
+  else if (score >= 700) { ring.style.borderColor='#4f9eff'; val.style.color='#4f9eff'; lbl.textContent='Good — 12.5% p.a.'; lbl.style.color='#4f9eff'; document.getElementById('csr-good').classList.add('highlight'); }
+  else if (score >= 600) { ring.style.borderColor='#f0b429'; val.style.color='#f0b429'; lbl.textContent='Fair — 15.0% p.a.'; lbl.style.color='#f0b429'; document.getElementById('csr-fair').classList.add('highlight'); }
+  else if (score >= 500) { ring.style.borderColor='#e25555'; val.style.color='#e25555'; lbl.textContent='Poor — 18.0% p.a.'; lbl.style.color='#e25555'; document.getElementById('csr-poor').classList.add('highlight'); }
+  else { ring.style.borderColor='#e25555'; val.style.color='#e25555'; lbl.textContent='Rejected'; lbl.style.color='#e25555'; document.getElementById('csr-bad').classList.add('highlight'); }
+}
+
+function switchAIView(view, el) {
+  document.querySelectorAll('#ai-ocr, #ai-fraud, #ai-completeness').forEach(e => e.style.display = 'none');
+  document.getElementById('ai-' + view).style.display = 'block';
+  document.querySelectorAll('#page-aiengine .nl-toggle').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function runOCR() {
+  const box = document.getElementById('ocr-result');
+  const text = document.getElementById('ocr-text');
+  box.style.display = 'block';
+  text.textContent = 'Running OCR extraction...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        messages: [{
+          role: 'user',
+          content: `Simulate OCR extraction result for a PAN card document. Output structured data as if extracted from an actual PAN card image. Include fields: Name, DOB, PAN Number, Photo Present (yes/no), Signature Present (yes/no), Document Legibility (score 1-10), Any Issues Found. Make up realistic Indian data. Format as clean key-value pairs. Keep it concise.`
+        }]
+      })
+    });
+    const data = await res.json();
+    text.textContent = data.content?.[0]?.text || 'OCR unavailable';
+  } catch(e) {
+    text.textContent = `Name: ARJUN KUMAR MEHTA\nDOB: 14/08/1991\nPAN: ABCME1234F\nPhoto Present: YES\nSignature Present: YES\nLegibility Score: 8.5/10\nIssues: Minor shadow on bottom-left corner\nStatus: DOCUMENT ACCEPTED`;
+  }
+}
+
+async function runFraudCheck() {
+  const appName = document.getElementById('fraud-app-name').value;
+  const panName = document.getElementById('fraud-pan-name').value;
+  if (!appName || !panName) { alert('Enter both names'); return; }
+
+  const box = document.getElementById('fraud-result');
+  const text = document.getElementById('fraud-text');
+  box.style.display = 'block';
+  text.textContent = 'Running AI identity verification...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: `You are an AI fraud detection system for NexLoan. Compare these two names and determine if they belong to the same person. Consider minor spelling variations, initials, middle names, and common name formats.
+Application Name: "${appName}"
+PAN Card Name (OCR extracted): "${panName}"
+Output: Match verdict (MATCH / MISMATCH / PARTIAL MATCH), confidence score (0-100%), explanation in 2 lines, recommendation (PROCEED / FLAG FOR REVIEW / REJECT). Format as key-value pairs.`
+        }]
+      })
+    });
+    const data = await res.json();
+    text.textContent = data.content?.[0]?.text || 'Analysis unavailable';
+  } catch(e) {
+    const similar = appName.toLowerCase().includes(panName.toLowerCase().split(' ')[0]) || panName.toLowerCase().includes(appName.toLowerCase().split(' ')[0]);
+    text.textContent = `Verdict: ${similar ? 'MATCH' : 'PARTIAL MATCH'}\nConfidence: ${similar ? 94 : 62}%\nExplanation: Names are ${similar ? 'consistent with minor formatting differences' : 'potentially different — manual verification needed'}.\nRecommendation: ${similar ? 'PROCEED' : 'FLAG FOR REVIEW'}`;
+  }
+}
+
+function runCompletenessCheck() {
+  const checks = [
+    { label: 'PAN Card Uploaded', pass: true },
+    { label: 'Aadhaar Card Uploaded', pass: true },
+    { label: 'PAN Legibility', pass: true },
+    { label: 'Aadhaar Legibility', pass: true },
+    { label: 'Photo Present on PAN', pass: true },
+    { label: 'Signature Present', pass: true },
+    { label: 'Name Match (PAN vs Application)', pass: loanData.name.length > 0 },
+    { label: 'Income Proof Required', pass: loanData.income > 0 },
+    { label: 'Application Form Complete', pass: loanData.amount > 0 },
+  ];
+
+  let html = '<div style="font-size:12px; font-weight:500; margin-bottom:10px;">KYC Completeness Report</div>';
+  checks.forEach(c => {
+    html += `<div class="nl-emi-row"><span style="color:var(--nl-muted)">${c.label}</span><span class="${c.pass ? 'nl-badge nl-badge-success' : 'nl-badge nl-badge-danger'}">${c.pass ? '✓ OK' : '✗ Missing'}</span></div>`;
+  });
+  const passed = checks.filter(c => c.pass).length;
+  html += `<div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--nl-border);"><span style="font-size:13px; font-weight:500; color:${passed === checks.length ? 'var(--nl-accent)' : 'var(--nl-gold)'};">${passed}/${checks.length} checks passed — ${passed === checks.length ? 'Ready for underwriting' : 'Pending items need attention'}</span></div>`;
+  document.getElementById('completeness-result').innerHTML = html;
+}
+
+// ---- CHATBOT ----
+let chatLoggedIn = false;
+let chatAwaitOTP = false;
+let chatOTPValue = '1234';
+
+function toggleChat() {
+  const win = document.getElementById('chat-window');
+  win.classList.toggle('hidden');
+  if (!win.classList.contains('hidden') && document.getElementById('chat-messages').children.length === 0) {
+    addChatMsg('bot', `Hello! 👋 I'm your NexLoan assistant. I can help you with:\n• Loan eligibility queries\n• Application status\n• EMI calculations\n\nType "check my status" to view your loan details (login required).`);
+  }
+}
+
+function addChatMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'nl-chat-msg ' + role;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addChatMsg('user', msg);
+
+  const lower = msg.toLowerCase();
+
+  if (lower.includes('check my status') || lower.includes('loan status') || lower.includes('my loan')) {
+    if (!chatLoggedIn) {
+      chatAwaitOTP = true;
+      addChatMsg('bot', 'To view your loan details, I need to verify your identity. I\'m sending an OTP to your registered mobile. Please enter it below.');
+      document.getElementById('chat-otp-section').style.display = 'block';
+      return;
+    } else {
+      showLoanStatus();
+      return;
+    }
+  }
+
+  if (chatAwaitOTP) {
+    addChatMsg('bot', 'Please enter the OTP in the fields above to verify your identity.');
+    return;
+  }
+
+  try {
+    const context = `You are NexLoan's customer service AI assistant. Be helpful and concise (2-3 sentences max). 
+Current loan info: Amount ₹${loanData.amount || 'not yet applied'}, EMI ₹${Math.round(loanData.emiAmount) || 'TBD'}, Rate ${loanData.interestRate || 'TBD'}%, Status: ${loanData.disbursed ? 'Active' : loanData.approved ? 'Approved' : 'Application in progress'}, Paid EMIs: ${loanData.paidEMIs}/${loanData.tenure}.`;
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        system: context,
+        messages: [{ role: 'user', content: msg }]
+      })
+    });
+    const data = await res.json();
+    addChatMsg('bot', data.content?.[0]?.text || 'Sorry, I couldn\'t process that. Please try again.');
+  } catch(e) {
+    const responses = {
+      'emi': `Your monthly EMI is ₹${Math.round(loanData.emiAmount).toLocaleString() || 'TBD'} for ${loanData.tenure} months.`,
+      'interest': `Your interest rate is ${loanData.interestRate || 'TBD'}% p.a. based on your credit score.`,
+      'eligib': `Eligibility depends on income, existing obligations, and credit score. Typically up to 24× monthly income.`,
+      'default': `I can help with EMI queries, loan status, eligibility, and general questions. How can I assist you?`
+    };
+    const key = Object.keys(responses).find(k => lower.includes(k)) || 'default';
+    addChatMsg('bot', responses[key]);
+  }
+}
+
+function showLoanStatus() {
+  const status = loanData.disbursed ? 'Active' : loanData.approved ? 'Approved - Pending Disbursement' : 'Application In Progress';
+  addChatMsg('bot', `Loan Status: ${status}\nAmount: ₹${loanData.amount.toLocaleString() || 'N/A'}\nEMI: ₹${Math.round(loanData.emiAmount).toLocaleString() || 'N/A'}/month\nEMIs Paid: ${loanData.paidEMIs}/${loanData.tenure}\nNext Action: ${loanData.paidEMIs >= loanData.tenure ? 'Proceed to closure' : 'Pay EMI #' + (loanData.paidEMIs + 1)}`);
+}
+
+function otpNext(i) {
+  const val = document.getElementById('otp' + i).value;
+  if (val && i < 3) document.getElementById('otp' + (i+1)).focus();
+}
+
+function verifyOTP() {
+  const entered = [0,1,2,3].map(i => document.getElementById('otp'+i).value).join('');
+  if (entered === chatOTPValue) {
+    chatLoggedIn = true;
+    chatAwaitOTP = false;
+    document.getElementById('chat-otp-section').style.display = 'none';
+    addChatMsg('bot', `✅ Identity verified! Welcome back, ${loanData.name || 'Borrower'}.`);
+    showLoanStatus();
+  } else {
+    addChatMsg('bot', '❌ Invalid OTP. Please try again. (Hint: use 1234)');
+    [0,1,2,3].forEach(i => { document.getElementById('otp'+i).value = ''; });
+    document.getElementById('otp0').focus();
+  }
+}
+
+updateStageDots();
+</script>
